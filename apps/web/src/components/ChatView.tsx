@@ -97,8 +97,6 @@ import {
   ChevronRightIcon,
   CircleAlertIcon,
   ListTodoIcon,
-  LockIcon,
-  LockOpenIcon,
   XIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -3534,7 +3532,7 @@ export default function ChatView({ threadId }: ChatViewProps) {
             {/* Messages */}
             <div
               ref={setMessagesScrollContainerRef}
-              className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 py-3 sm:px-5 sm:py-4"
+              className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-3 pt-3 pb-6 sm:px-5 sm:pt-4 sm:pb-8"
               onScroll={onMessagesScroll}
               onClickCapture={onMessagesClickCapture}
               onWheel={onMessagesWheel}
@@ -3587,8 +3585,8 @@ export default function ChatView({ threadId }: ChatViewProps) {
             )}
           </div>
 
-          {/* Input bar */}
-          <div className={cn("px-3 pt-1.5 sm:px-5 sm:pt-2", isGitRepo ? "pb-1" : "pb-3 sm:pb-4")}>
+          {/* Input bar — overlaps messages with a gradient fade for a seamless transition */}
+          <div className="relative z-10 -mt-12 bg-linear-to-t from-background from-60% to-transparent px-3 pt-12 pb-1 sm:-mt-16 sm:px-5 sm:pt-16">
             <form
               ref={composerFormRef}
               onSubmit={onSend}
@@ -3855,35 +3853,6 @@ export default function ChatView({ threadId }: ChatViewProps) {
                               </span>
                             </Button>
 
-                            <Separator
-                              orientation="vertical"
-                              className="mx-0.5 hidden h-4 sm:block"
-                            />
-
-                            <Button
-                              variant="ghost"
-                              className="shrink-0 whitespace-nowrap px-2 text-muted-foreground/70 hover:text-foreground/80 sm:px-3"
-                              size="sm"
-                              type="button"
-                              onClick={() =>
-                                void handleRuntimeModeChange(
-                                  runtimeMode === "full-access"
-                                    ? "approval-required"
-                                    : "full-access",
-                                )
-                              }
-                              title={
-                                runtimeMode === "full-access"
-                                  ? "Full access — click to require approvals"
-                                  : "Approval required — click for full access"
-                              }
-                            >
-                              {runtimeMode === "full-access" ? <LockOpenIcon /> : <LockIcon />}
-                              <span className="sr-only sm:not-sr-only">
-                                {runtimeMode === "full-access" ? "Full access" : "Supervised"}
-                              </span>
-                            </Button>
-
                             {activePlan || sidebarProposedPlan || planSidebarOpen ? (
                               <>
                                 <Separator
@@ -4083,19 +4052,20 @@ export default function ChatView({ threadId }: ChatViewProps) {
                 </div>
               </div>
             </form>
-          </div>
 
-          {isGitRepo && (
-            <BranchToolbar
-              threadId={activeThread.id}
-              onEnvModeChange={onEnvModeChange}
-              envLocked={envLocked}
-              onComposerFocusRequest={scheduleComposerFocus}
-              {...(canCheckoutPullRequestIntoThread
-                ? { onCheckoutPullRequestRequest: openPullRequestDialog }
-                : {})}
-            />
-          )}
+          <BranchToolbar
+            threadId={threadId}
+            runtimeMode={runtimeMode}
+            onRuntimeModeChange={handleRuntimeModeChange}
+            showBranchSelector={isGitRepo}
+            onEnvModeChange={onEnvModeChange}
+            envLocked={envLocked}
+            onComposerFocusRequest={scheduleComposerFocus}
+            {...(canCheckoutPullRequestIntoThread
+              ? { onCheckoutPullRequestRequest: openPullRequestDialog }
+              : {})}
+          />
+          </div>
           {pullRequestDialogState ? (
             <PullRequestThreadDialog
               key={pullRequestDialogState.key}
